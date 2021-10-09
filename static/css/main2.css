@@ -1,0 +1,14 @@
+.like{
+	float: right;
+	font-size:20px;
+	color:#ccc!important;
+	cursor:pointer;
+}
+.cs{color:#f00!important;}
+
+.fav{
+	float: right;
+	font-size:20px;
+	color:#ccc;
+	cursor:pointer;
+}

@@ -1,0 +1,194 @@
+{% extends 'common/main_layout.html' %}
+{% block title %}
+我的收藏
+{% endblock %}
+
+{% block head %}
+ <style type="text/css">
+    .page{
+        margin-top: 20px;
+        list-style-type: none;
+        width: 500px;
+    }
+    .page>li{
+        display: inline-block;
+        margin-right: 20px;
+    }
+    .page>li a:link{
+        text-decoration: none;
+    }
+    .page>li a:hover{
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>我的收藏</h1>
+    <script type="text/javascript">
+        //定义一个变量，表示分页信息
+        page={
+            "pageindex":1 //表示当前页索引，默认从1开始
+        };
+
+        $(function(){
+				fn();
+				setInterval(fn,1000);
+			})
+        /**
+         * 这是用来加载图书的
+         */
+        function loadNews(){
+            //将表格里的老数据，每次查找之前清除掉
+            $(".tb tr:gt(0)").remove();
+            url='/user/api/usernews/list/'
+            data=$("form").serialize();//调用jquery的序列化方法，封装查询条件
+            data=data+"&pageindex="+page.pageindex ;//需要将页索引页传递给服务端
+
+            $.ajax({
+                url:url,//服务端网址
+                cache:false,//禁用客户端浏览器缓存,
+                dataType:'json',//服务端响应的数据格式
+                type:'get',//请求类型 get/post delete put
+                data:data,//此参数是封装传递给服务端的查询条件
+                beforeSend:function(xhr){
+                    //当ajax请求开始时执行，参数xhr，就是那个xmlHttpRequest对象
+                    //console.log('开始请求了,beforeSend');
+                    //设置标签的显示文本，淡入的动画效果
+                    $("#tip").html("正在拼命查询中...").fadeIn();
+                },
+                complete:function(xhr,status){
+                  //ajax请求完毕，不管成功和失败 ,readyState==4
+                    //console.log('ajax请求完毕,complete');
+                    $("#tip").fadeOut(2000,function(){
+                        // this表示当前对象，此对象是dom元素，表示当前的那个span
+                        //$(this),功能将这个dom元素，转成jquery对象。
+                        $(this).html("")//时间到后，执行本回调函数，清楚文本
+                    })
+                },
+                success:function(json,status,xhr){
+                    //当请求成功以后执行  status==200
+                    //console.log(result)
+
+                    if(json.success==0){
+                        page=json.page;//赋值分页信息
+                        //成功,呈现数据
+                        for(let b of json.data){
+                            var html=`
+                             <tr>
+                                <td><a href="{% url 'news:news' id %}">${b.id}</a> </td>
+                                <td>${b.title}</td>
+                                <td>${b.description}</td>
+                                <td>${b.create_date}</td>
+                                <td>
+                                    <a href="javascipt:void(0)"
+                                    onclick="deleteme(${b.id})"
+                                    >删除</a>
+                                </td>
+                            </tr>
+                            `;
+                            $(".tb").append($(html))
+
+                        }
+                        //这里是对分页提示进行更新
+                        $(".page>li:first-child>span").html("记录总数:"+page.recordcount);
+                        $(".page>li:eq(3)>span").html("共"+page.pagecount+"页,第"+page.pageindex+"页");
+                    }else{
+                        alert(json.msg);
+                    }
+
+                },
+                error:function(xhr,status,error){
+                    console.log('ajax请求发生了错误',status);
+                },
+            })
+        }
+        ////////////////////
+        function nextPage(){
+            if(page.pageindex+1<=page.pagecount){
+                page.pageindex+=1;
+            }
+            loadNews();//加载页码
+        }
+        function prevPage(){
+            if (page.pageindex-1>0){
+                page.pageindex-=1;
+            }
+            loadNews();//加载页码
+        }
+        //////////////////////////////////////////
+        function deleteme(id){
+            if(confirm('真的要删除编号为'+id+'的记录么?')==false){
+                return false;
+            }
+            //开始实现ajax请求，get方法是ajax方法的一个简化版本，最后一个参数表示服务端返回的数据类型
+            url='/user/api/usernews/delete/'
+            data={"id":id} //传递给服务端的参数
+            //第二个参数表示传递给服务端的数据可以是json对象，方法内部会自动序列化 ?id=1
+            //最后一个参数表示服务端返回的数据类型。此方法，就是 getJSON()
+            $.get(url,data,function(json){
+                if(json.success==0){
+                    alert('删除成功!');
+                    loadNews();//加载数据，刷新表格
+                }else{
+                    alert(json.msg)
+                }
+            },'json');
+
+        }
+        //jquery的启动事件
+        $(function(){
+            loadNews();//加载图书
+            $("#btnSearch").on('click',function(){
+                //查询
+                page.pageindex=1
+                loadNews()
+            }) //查询
+             $('#btnNext').on('click',nextPage);
+             $('#btnPrev').on('click',prevPage);
+
+            $('#btnFirst').on('click',function(){
+                page.pageindex=1
+                loadNews()
+            });
+            $('#btnLast').on('click',function(){
+                page.pageindex=page.pagecount;
+                console.log('最后页--->',page)
+                loadNews()
+            });
+        })
+    </script>
+
+
+<fieldset>
+    <legend>查询区</legend>
+    <!--表单不写action,默认是当前url-->
+    <form method="get">
+        <span>开始时间：</span>
+        <input type="date" name="create_date" placeholder="请输入日期"/>
+        <input type="button" id="btnSearch" value="查询"/>
+        <span id="tip"></span>
+    </form>
+</fieldset>
+<div>
+        <table class="tb">
+            <tr>
+                <th>编号</th>
+                <th>标题</th>
+                <th>摘要</th>
+                <th>发布时间</th>
+                <th>操作</th>
+            </tr>
+
+            <!--请求成功，数据显示在此-->
+        </table>
+        <ul class="page">
+            <li><span>记录总数:62</span></li>
+            <li><a href="javascript:void(0)" id="btnFirst">首页</a> </li>
+            <li><a href="javascript:void(0)" id="btnPrev">上页</a> </li>
+            <li><span>共7页,第1页</span></li>
+            <li><a href="javascript:void(0)" id="btnNext">下页</a> </li>
+            <li><a href="javascript:void(0)" id="btnLast">尾页</a> </li>
+        </ul>
+    </div>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends 'common/main_layout.html' %}
+{% load filters %}
+{% block title %}
+个人信息
+{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+<script type="text/javascript">
+    $('#target').distpicker();
+
+    function loadUser(){
+        //加载用户，ajax请求
+        var url='/user/api/userinfo/'
+        $.ajax({
+            url: url,//服务端网址
+            type: 'get', //"GET"。请求方式 ("POST" 或 "GET")， 默认为 "GET"。注意：其它 HTTP 请求方法，如 PUT 和 DELETE 也可
+            dataType: 'json',//预期服务器返回的数据类型。 text,json,html,jsonp...
+            success: function (json) {
+                  console.log(json);
+                if (json.success == 0) {
+                    $('[name="name"]').val(json.data.name);
+                    $('[name="phone"]').val(json.data.phone);
+                    // $('[name="gender"]').val(json.data.gender);
+                    $('[name="birthday"]').val(json.data.birthday);
+                    $('[name="province"]').val(json.data.province);
+                    $('[name="city"]').val(json.data.city);
+                    $('[name="district"]').val(json.data.district);
+                    $('[name="id_card_number"]').val(json.data.id_card_number);
+                    $('[name="email"]').val(json.data.email);
+                } else {
+                    console.log(json)
+                }
+            },
+            error: function (xhr) {
+                //在请求出错时调用。传入 XMLHttpRequest 对象，描述错误类型的字符串以及一个异常对象（如果有的话
+                console.log('ajax请求完成，stauts!=200,出错了', xhr.status)
+            }
+        })
+    }
+    function updateUser(){
+        var url='/user/api/userinfo/change/'
+        data=$("form").serialize();//序列化表单数据，提交给服务端
+        $.ajax({
+            url:url,//服务端网址
+            cache:false,//禁用客户端浏览器缓存,
+            dataType:'json',//服务端响应的数据格式
+            type:'post',//请求类型 get/post delete put
+            data:data,//此参数是封装传递给服务端的查询条件
+            success:function(json){
+              console.log(json);
+              if(json.success==0){
+                  alert("更新成功")
+              }else{
+                  alert("更新失败")
+              }
+            },
+        })
+    }
+    $(function(){
+           $.ajaxSetup({
+              'cache':false //禁用客户端缓存
+            });
+           loadUser();
+           $("#btnOk").on('click',updateUser);
+       })
+</script>
+<h2>信息修改</h2>
+<form>
+    <div>
+        <label for="id_name">真实姓名</label>
+        <input type="text" name="name" placeholder="这里输入真实姓名" maxlength="20" required id="id_name">
+        <span></span>
+<!--required 必填字段-->
+    </div>
+    <div>
+        <label for="id_phone">手机号码</label>
+        <input type="number" name="phone" value="0" maxlength="11" required id="id_phone">
+        <span></span>
+    </div>
+    <div>
+        <label>性别</label>
+        <input type="radio" name="gender" value="0">
+        <span>男</span>
+        <input type="radio" name="gender" value="1">
+        <span>女</span>
+    </div>
+    <div>
+        <label for="id_birthday">出生日期</label>
+        <input type="date" name="birthday" value="" id="id_birthday">
+        <span></span>
+    </div>
+    <div data-toggle="distpicker">
+        <span>家庭地址</span>
+        <select name="province" data-province="---- 选择省 ----"></select>
+        <select name="city" data-city="---- 选择市 ----"></select>
+        <select name="district" data-district="---- 选择区 ----"></select>
+        <span></span>
+    </div>
+    <div>
+        <label for="id_id_card_number">身份证号码</label>
+        <input type="number" name="id_card_number" maxlength="18" required id="id_id_card_number" style="width: 150px;">
+        <span></span>
+    </div>
+    <div>
+        <label for="id_email">邮箱地址</label>
+        <input type="email" name="email" placeholder="这里输入邮箱地址" id="id_email">
+        <span></span>
+    </div>
+    <div>
+        <input type="button" value="确认修改" id="btnOk">
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends 'common/layout3.html' %}
+
+{% block title %}
+修改信息
+{% endblock %}
+
+{% block content %}
+    <div>
+        <h2>修改信息</h2>
+        <h3>{{ msg|default_if_none:''}}</h3>
+        <!--novalidate 表示不启用h5校验-->
+<!--        <form method="post" novalidate>-->
+        <div>
+                <p>
+                    <span>{{ record.id }}:</span>
+                    <span id="id"></span>
+                </p>
+                <p>
+                    <span>{{ record.name.name }}:</span>
+                    <input type="text"
+                       name="name"
+                       max="100"
+                       min="0"
+                       value=""
+                    />
+                    <span class="error" style="color: red">{{ record.name.errors.0}}</span>
+                </p>
+                <p>
+                    <span>{{ record.phone.name }}:</span>
+                    <span id="phone">{{ record.phone }}</span>
+                    <span class="error" style="color: red">{{ record.phone.errors.0}}</span>
+                </p>
+                <p>
+                    <span>{{ record.gender.name }}:</span>
+                    <span id="gender">{{ record.gender }}</span>
+                    <span class="error" style="color: red">{{ record.gender.errors.0}}</span>
+                </p>
+                <p>
+                    <span>{{ record.birthday.name }}:</span>
+                    <span id="birthday">{{ record.birthday }}</span>
+                    <span class="error" style="color: red">{{ record.birthday.errors.0}}</span>
+                </p>
+                <div id="distpicker3">
+                    <span>{{ record.province.name }}:</span>
+                  <select id="province" ></select>
+                    <span>{{ record.city.name }}:</span>
+                  <select id="city"></select>
+                    <span>{{ record.district.name }}:</span>
+                  <select id="district"></select>
+                </div>
+                <p>
+                    <span>{{ record.id_card_number.name }}:</span>
+                    <span id="id_card_number">{{ record.id_card_number }}</span>
+                    <span class="error" style="color: red">{{ record.id_card_number.errors.0}}</span>
+                </p>
+                <p>
+                    <span>{{ record.email.name }}:</span>
+                    <span id="email">{{ record.email }}</span>
+                    <span class="error" style="color: red">{{ record.email.errors.0}}</span>
+                </p>
+                <p>
+                    <input type="button" id="btnOk" value="确认修改"/>
+                </p>
+        </div>
+<script>
+
+    $("#distpicker3").distpicker({
+      province: "浙江省",
+      city: "杭州市",
+      district: "西湖区"
+    });
+
+
+    var id;//定义脚本级变量，表示当前编号
+       //ajax请求，获取要更新的记录信息
+    function loadRecord(){
+           //demo04.html?id=18
+           //从请求中获取id参数值
+           //如果是局部变量，需要加 var, 不加，定义的变量属于顶层对象 window
+           id=stringHelper.requet_parameter(location.href,"id");
+           console.log(id)
+           var url='/user/api/userinfo/'+id+"/";
+           $.ajax({
+           url:url,//请求网址
+           type:'get', //"GET"。请求方式 ("POST" 或 "GET")， 默认为 "GET"。注意：其它 HTTP 请求方法，如 PUT 和 DELETE 也可
+           dataType:'json',//预期服务器返回的数据类型。 text,json,html,jsonp...
+           success:function(json){
+
+              if(json.success==0){
+                  $("#id").html(json.data.id)
+                  $("#name").html(json.data.name)
+                  $("#phone").html(json.data.phone)
+                  $("input[name='degree']").val(json.data.degree)
+              }else{
+                 console.log(json.msg)
+               }
+           },
+           error:function (xhr){
+                //在请求出错时调用。传入 XMLHttpRequest 对象，描述错误类型的字符串以及一个异常对象（如果有的话
+               console.log('ajax请求完成，stauts!=200,出错了',xhr.status)
+           }
+       });
+       }
+       //更新成绩
+       function update_score(){
+           var url='/app07/api_v2/score/';
+           //构造需要传递给服务端的数据
+           post_param={
+               "id":id,
+               "degree":$("input[name='degree']").val()
+           }
+           $.ajax({
+           url:url,//请求网址
+           type:'PUT', //"POST"。请求方式 ("POST" 或 "GET")， 默认为 "GET"。注意：其它 HTTP 请求方法，如 PUT 和 DELETE 也可
+           contentType:'application/json',//设置请求类型为 json
+           data:JSON.stringify(post_param),//js提供了一个JSON对象，此方法就是将JSON对象，序列化成json格式字符串
+           dataType:'json',//预期服务器返回的数据类型。 text,json,html,jsonp...
+           success:function(json){
+              if(json.success==0){
+                  alert('更新成功')
+              }else{
+                 console.log("更新失败："+json.msg)
+               }
+           },
+           error:function (xhr){
+                //在请求出错时调用。传入 XMLHttpRequest 对象，描述错误类型的字符串以及一个异常对象（如果有的话
+               console.log('ajax请求完成，stauts!=200,出错了',xhr.status)
+           }
+        });
+   }
+
+       $(function(){
+           $.ajaxSetup({
+              'cache':false //禁用客户端缓存
+            });
+           loadRecord();
+           $("#btnOk").on('click',update_score);
+       })
+    </script>
+{% block footer %}
+<script src="../../static/js/stringhelper.js" type="text/javascript">
+<script src="../../static/js/distpicker.data.min.js"></script>
+<script src="../../static/js/distpicker.min.js"></script>
+{% endblock %}
+
+{% endblock %}

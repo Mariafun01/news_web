@@ -1,0 +1,87 @@
+{% extends 'common/layout3.html' %}
+{% block title %}
+修改密码
+{% endblock %}
+{% block content %}
+             <div class="r_zc" node-response="zhongce" style="display: none;">
+                <div class="zc_main" id="zc_main">
+                    <div class="zc_tab" id="zc_tab">
+                        <a href="javascript:;" data-source="activity" node-relation="zc-activity" class="selected" suda-uatrack="key=usercenter_zhongce&amp;value=applied_total">我申请的活动</a>
+                        <span>|</span>
+                        <a href="javascript:;" node-relation="zc-report" data-source="report" suda-uatrack="key=usercenter_zhongce&amp;value=report_total">我的评测报告</a>
+                    </div>
+                    <div class="zc_con zc_activity">
+                        <div class="con_tab" id="con_tab1">
+                        </div>
+                        <ul class="con_con" id="con_con1">
+                        </ul>
+                        <div class="zcPageDiv" id="zcPageDiv1" style="display:none;">
+                            <a href="javascript:;" class="btn unclick" id="page_prev1">上一页</a>
+                                <span id="page_box_wrap1"></span>
+                            <a href="javascript:;" class="btn" id="page_next1">下一页</a>
+                        </div>
+                    </div>
+                    <div class="zc_con zc_report" style="display:none">
+                        <div class="con_tab" id="con_tab2"><a href="javascript:;" data-num="1" class="selected" suda-uatrack="key=usercenter_zhongce&amp;value=report_published">已公布(<span>0</span>)</a><a href="javascript:;" data-num="2" suda-uatrack="key=usercenter_zhongce&amp;value=report_examing">审核中(<span>0</span>)</a><a href="javascript:;" data-num="4" suda-uatrack="key=usercenter_zhongce&amp;value=report_tobe_examined">草稿(<span>0</span>)</a><a href="javascript:;" data-num="3" suda-uatrack="key=usercenter_zhongce&amp;value=report_examine_fail">审核未通过(<span>0</span>)</a></div>
+                        <ul class="con_con" id="con_con2"><li class="noli">您暂时还无已发布报告，请再接再厉哦。<a href="http://zhongce.sina.com.cn/activity/lists/" target="_blank" class="more">查看众测产品&gt;&gt;</a></li></ul>
+                        <div class="zcPageDiv" id="zcPageDiv2" style="display:none">
+                            <a href="javascript:;" class="btn unclick" id="page_prev2">上一页</a>
+                                <span id="page_box_wrap2"></span>
+                            <a href="javascript:;" class="btn" id="page_next2">下一页</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+  <h1>修改个人密码</h1>
+    <div>
+        <h2>登录账号：{{ request.username }}</h2>
+        <p>
+            <label for="pwd1">原密码:</label>
+            <input type="password" name="userPassword" id="pwd1"/>
+        </p>
+        <p>
+            <label for="pwd2">新密码:</label>
+            <input type="password" name="userPassword2" id="pwd2"/>
+        </p>
+        <p>
+            <label for="pwd3">重复密码:</label>
+            <input type="password" name="userPassword3" id="pwd3"/>
+        </p>
+        <p>
+            <input type="button" value="修改" id="btnOk" />
+        </p>
+    </div>
+  <script src="../../static/js/jquery.min.js"></script>
+    <script>
+        function update_pwd(){
+           var url='/user/api/changepwd/';
+           //构造需要传递给服务端的数据
+           post_param={
+               "pwd1":$("#pwd1").val(),
+               "pwd2":$("#pwd2").val()
+           }
+           console.log(post_param)
+           $.ajax({
+               url:url,//请求网址
+               type:'post', //"POST"。请求方式 ("POST" 或 "GET")， 默认为 "GET"。注意：其它 HTTP 请求方法，如 PUT 和 DELETE 也可
+               dataType:'json',//预期服务器返回的数据类型。 text,json,html,jsonp...
+               data:post_param,//传递参数
+               success:function(json){
+                  if(json.success==0){
+                      alert('更新成功')
+                  }else{
+                     alert("更新失败："+json.msg)
+                   }
+               },
+               error:function (xhr){
+                    //在请求出错时调用。传入 XMLHttpRequest 对象，描述错误类型的字符串以及一个异常对象（如果有的话
+                   console.log('ajax请求完成，stauts!=200,出错了',xhr.status)
+               }
+        });
+   }
+        $(function (){
+            $("#btnOk").on('click',update_pwd)
+        })
+    </script>
+{% endblock %}

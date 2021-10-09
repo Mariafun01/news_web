@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>
+          {% block title %}
+            网站标题
+          {% endblock %}
+        </title>
+		<base href="{% static '/' %}">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="css/main.css" />
+	</head>
+
+	<body>
+		<div class="navbar navbar-default">
+			<div class="container">
+				<div class="navbar-header">
+					<a href="{% url 'news:index' %}" class="navbar-brand"></a>
+				</div>
+				<label id="toggle-label" class="visible-xs-block" for="toggle-checkbox">	菜单</label>
+				<input class="hidden" id="toggle-checkbox" type="checkbox" name="" id="" value="" />
+				<div class="hidden-xs">
+					<ul class="nav navbar-nav">
+						<li class="active">
+							<a href="{% url 'news:index' %}">首页</a>
+						</li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="{% url 'user:logout' %}">退出</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+        <div class="container container-small">
+          {% block content %}
+          正文
+          {% endblock %}
+        </div>
+		<div class="footer text-center">
+			© 1997-2018 网易公司版权所有 About NetEase | 公司简介 | 联系方法 | 招聘信息 | 客户服务 | 隐私政策 | 广告服务 | 网站地图 | 意见反馈 | 不良信息举报
+		</div>
+	</body>
+
+</html>

@@ -1,0 +1,240 @@
+{% extends 'common/layout.html' %}
+{% block title %}
+新闻
+{% endblock %}
+
+{% block head %}
+		<link rel="stylesheet" type="text/css" href="css/main2.css" />
+		<script type="text/javascript" src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+
+		<script>
+			function saveme(id){
+            url='/news/news/api/fav/'+id+"/";//"demo03_01.json";
+
+            $.getJSON(url,function (json){
+            	console.log(json)
+            	if (json.success==0){
+
+            		if(json.data==1){
+            			alert('收藏成功')
+						$("#fav").addClass('cs')
+					}else{
+            			alert('取消收藏成功')
+						$("#fav").removeClass('cs')
+					}
+				}
+            })
+        }
+
+
+		</script>
+{% endblock %}
+
+		<div class="navbar navbar-default">
+			<div class="container">
+				<div class="navbar-header">
+					<a href="index.html" class="navbar-brand"></a>
+				</div>
+				<label id="toggle-label" class="visible-xs-block" for="toggle-checkbox">	菜单</label>
+				<input class="hidden" id="toggle-checkbox" type="checkbox" name="" id="" value="" />
+				<div class="hidden-xs">
+					<ul class="nav navbar-nav">
+						<li>
+							<a href="{% url 'index' %}">首页</a>
+						</li>
+						<li>
+							<a href="#">国内</a>
+						</li>
+						<li>
+							<a href="#">国际</a>
+						</li>
+						<li>
+							<a href="#">体育</a>
+						</li>
+						<li>
+							<a href="#">娱乐</a>
+						</li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="{% url 'user:login' %}">登陆</a>
+						</li>
+						<li>
+							<a href="{% url 'user:register' %}">注册</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		{% block content %}
+		<div class="container">
+
+			<div class="col-md-8">
+				{% for n in new %}
+				<input type="hidden" name="new_id" value="{{ n.id }}" id="new_id">
+				<h1 class="news-title">{{n.title}}</h1>
+				<div class="news-status">23K阅读 {{n.create_date}}
+					<!--类别-->
+					{% for c in category %}
+					<div class="label label-default">{{c.name}}</div>
+					{% endfor %}
+
+					<!--标签-->
+					{% ifequal label_ret True %}
+					<div class="label label-default">{{l.name}}</div>
+<!--					<input type="text" name="get_label_name" value="{{ l.name }}" >-->
+<!--					<input type="text" name="get_label_name" value="{{ label.name }}" >-->
+					{% endifequal %}
+					{% ifequal label_ret False %}
+					<div class="label label-default">无关键字</div>
+<!--					<input type="text" name="get_label_name" value="{{ l.name }}" >-->
+<!--					<input type="text" name="get_label_name" value="{{ label.name }}" >-->
+					{% endifequal %}
+
+					<!--收藏-->
+					{% ifequal username None %}
+					<p class="fav"><a style="color: #ccc;"
+									  href="{% url 'user:login' %}">收藏&#9733;</a></p>
+					{% endifequal %}
+<!--					<input type="text" name="get_user_id" value="{{ user.id }}" >-->
+<!--					<input type="text" name="get_new_id" value="{{ n.id }}" >-->
+<!--					<input type="text" name="get_fav_id" value="{{ user.news }}" >-->
+<!--					<input type="text" name="get_id" value="{{ ret }}" >-->
+						<input type="hidden" name="get_id" value="{{ ret }}" >
+
+						<a href="javascript:void(0)"
+						   id="fav"
+						   onclick="saveme({{n.id}})"
+						class="like
+						{% ifequal ret True %} cs
+						{% endifequal %}"
+						   style="text-decoration: none;">收藏&#9733;</a>
+
+
+				</div>
+				<div class="news-content">
+<!--					<div>{{new.description}}</div>-->
+					<img src="img/001.png" />
+					<div>{{n.text}}</div>
+				</div>
+				{% endfor %}
+				<p>————————————————————————————————————————————————————</p>
+				<!--评论区-->
+				<div>
+					<h4>评论</h4>
+					{% for c in comments %}
+					<div>
+						<div class="c_lft" style="float: left">
+							<span style="color: darkorange">{{c.createUser.name}}</span>
+						</div>
+						<div class="c_rgt" style="float: right">
+							<span>{{c.createDate}}</span>
+						</div>
+					</div>
+					<p><b>&nbsp;&nbsp;{{c.title}}</b></p>
+					<p>{{c.text}}</p>
+
+					<p style="color: #eeeeee">————————————————————————————————————————————————————</p>
+					{% endfor %}
+					<p style="color: #eeeeee">————————————————————————————————————————————————————</p>
+
+				</div>
+				<div>
+					<h4>我要评论</h4>
+					 <form action="{% url 'news:upload_comment' %}" method="post">
+
+						<input type="hidden" name="id" value="{{ id }}" id="id">
+						<p>
+							<label for="">评论标题:</label>
+							<input type="text" name="title" id="title" placeholder="请输入你的评论标题">
+						</p >
+						<p>
+							<label for="">评论内容:</label>
+							<textarea name="text" id="text" cols="30" rows="10" placeholder="请输入评论的正文" style="width: 650px;height: 100px;"></textarea>
+						</p >
+						<p>
+							<input type="submit" value="发布评论">
+						</p >
+					</form>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="side-bar-card">
+					<div class="card-title">相关推荐</div>
+					<div class="card-body ">
+						<div class="list">
+							<div class="item clearfix">
+								<div class="col-xs-5 no-padding-h"><img src="../../static/img/001.png" /></div>
+								<div class="col-xs-7">
+									<div class="title">标题栏</div>
+									<div class="desc">23K阅读 35分钟前发布</div>
+								</div>
+							</div>
+							<div class="item clearfix">
+								<div class="col-xs-5 no-padding-h"><img src="i../static/img/001.png" /></div>
+								<div class="col-xs-7">
+									<div class="title">标题栏</div>
+									<div class="desc">23K阅读 35分钟前发布</div>
+								</div>
+							</div>
+							<div class="item clearfix">
+								<div class="col-xs-5 no-padding-h"><img src="../../static/img/001.png" /></div>
+								<div class="col-xs-7">
+									<div class="title">标题栏</div>
+									<div class="desc">23K阅读 35分钟前发布</div>
+								</div>
+							</div>
+							<div class="item clearfix">
+								<div class="col-xs-5 no-padding-h"><img src="../../static/img/001.png" /></div>
+								<div class="col-xs-7">
+									<div class="title">标题栏</div>
+									<div class="desc">23K阅读 35分钟前发布</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+				<div class="side-bar-card">
+					<div class="card-title">24小时热文</div>
+					<div class="card-body">
+						<div class="list">
+							<div class="item">
+								<div class="title">
+									Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+								</div>
+								<div class="desc">15K阅读 1k评论</div>
+							</div>
+							<div class="item">
+								<div class="title">
+									Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+								</div>
+								<div class="desc">15K阅读 1k评论</div>
+							</div>
+							<div class="item">
+								<div class="title">
+									Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+								</div>
+								<div class="desc">15K阅读 1k评论</div>
+							</div>
+							<div class="item">
+								<div class="title">
+									Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+								</div>
+								<div class="desc">15K阅读 1k评论</div>
+							</div>
+							<div class="item">
+								<div class="title">
+									Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+								</div>
+								<div class="desc">15K阅读 1k评论</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+		{% endblock %}
+

@@ -1,0 +1,64 @@
+{% extends 'common/main_layout.html' %}
+{% block title %}
+修改密码
+{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+  <script>
+        function update_pwd(){
+           var url='/user/api/userinfo/changepwd/';
+           //构造需要传递给服务端的数据
+           post_param={
+               "pwd1":$("#pwd1").val(),
+               "pwd2":$("#pwd2").val()
+           }
+           console.log(post_param)
+           $.ajax({
+               url:url,//请求网址
+               type:'post', //"POST"。请求方式 ("POST" 或 "GET")， 默认为 "GET"。注意：其它 HTTP 请求方法，如 PUT 和 DELETE 也可
+               dataType:'json',//预期服务器返回的数据类型。 text,json,html,jsonp...
+               data:post_param,//传递参数
+               success:function(json){
+                  if(json.success==0){
+                      alert('更新成功')
+                  }else{
+                     alert("更新失败："+json.msg)
+                   }
+               },
+               error:function (xhr){
+                    //在请求出错时调用。传入 XMLHttpRequest 对象，描述错误类型的字符串以及一个异常对象（如果有的话
+                   console.log('ajax请求完成，stauts!=200,出错了',xhr.status)
+               }
+        });
+   }
+        $(function (){
+            $("#btnOk").on('click',update_pwd)
+        })
+    </script>
+
+<body>
+    <h1>修改个人密码</h1>
+    <div>
+        <h2>登录账号：{{ username }}</h2>
+        <p>
+            <label for="pwd1">原密码:</label>
+            <input type="password" name="pwd1" id="pwd1"/>
+        </p>
+        <p>
+            <label for="pwd2">新密码:</label>
+            <input type="password" name="pwd2" id="pwd2"/>
+        </p>
+        <p>
+            <label for="pwd3">重复密码:</label>
+            <input type="password" name="pwd3" id="pwd3"/>
+        </p>
+        <p>
+            <input type="button" value="更新" id="btnOk" />
+        </p>
+    </div>
+</body>
+
+{% endblock %}
